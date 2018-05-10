@@ -37,7 +37,7 @@ type Hosts struct {
 }
 
 // Get function
-func Get(redirecturl string) *HTTPRedirects {
+func Get(redirecturl string, nameserver string) *HTTPRedirects {
 	r := new(HTTPRedirects)
 
 	r.URL = redirecturl
@@ -127,7 +127,7 @@ func Get(redirecturl string) *HTTPRedirects {
 	}
 
 	for key := range urllist {
-		host := getHosts(key)
+		host := getHosts(key, nameserver)
 		r.Hosts = append(r.Hosts, host)
 	}
 
@@ -143,12 +143,12 @@ func hostFromURL(geturl string) (string, error) {
 }
 
 // getHosts function
-func getHosts(geturl string) *Hosts {
+func getHosts(geturl string, nameserver string) *Hosts {
 	r := new(Hosts)
 
 	r.Hostname = geturl
 
-	cname, err := GetCNAME(r.Hostname, "8.8.4.4")
+	cname, err := GetCNAME(r.Hostname, nameserver)
 	if err != nil {
 		r.Error = "Failed"
 		r.ErrorMessage = err.Error()
@@ -160,7 +160,7 @@ func getHosts(geturl string) *Hosts {
 		return r
 	}
 
-	ar, err := GetA(r.Hostname, "8.8.4.4")
+	ar, err := GetA(r.Hostname, nameserver)
 	if err != nil {
 		r.Error = "Failed"
 		r.ErrorMessage = err.Error()
@@ -168,7 +168,7 @@ func getHosts(geturl string) *Hosts {
 	}
 	r.IPv4 = ar
 
-	aaaar, err := GetAAAA(r.Hostname, "8.8.4.4")
+	aaaar, err := GetAAAA(r.Hostname, nameserver)
 	if err != nil {
 		r.Error = "Failed"
 		r.ErrorMessage = err.Error()

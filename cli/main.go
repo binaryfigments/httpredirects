@@ -12,7 +12,7 @@ import (
 func main() {
 	url := strings.ToLower(os.Args[1])
 
-	rd := httpredirects.Get(url)
+	rd := httpredirects.Get(url, "1.1.1.1")
 
 	json, err := json.MarshalIndent(rd, "", "  ")
 	if err != nil {
