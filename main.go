@@ -117,7 +117,7 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 		// fmt.Println("StatusCode:", resp.StatusCode)
 		// fmt.Println(resp.Request.URL)
 
-		if resp.StatusCode == 200 {
+		if resp.StatusCode == 200 || resp.StatusCode > 303 {
 			// fmt.Println("Done!")
 			break
 		} else {
