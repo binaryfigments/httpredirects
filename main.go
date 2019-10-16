@@ -11,8 +11,8 @@ import (
 	"github.com/miekg/dns"
 )
 
-// HTTPRedirects struct
-type HTTPRedirects struct {
+// Data struct
+type Data struct {
 	URL          string       `json:"url,omitempty"`
 	Redirects    []*Redirects `json:"redirects,omitempty"`
 	Hosts        []*Hosts     `json:"hosts,omitempty"`
@@ -38,8 +38,8 @@ type Hosts struct {
 }
 
 // Get function
-func Get(redirecturl string, nameserver string) *HTTPRedirects {
-	r := new(HTTPRedirects)
+func Get(redirecturl string, nameserver string) *Data {
+	r := new(Data)
 
 	r.URL = redirecturl
 
