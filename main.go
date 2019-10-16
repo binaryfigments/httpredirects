@@ -51,7 +51,6 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 	}
 
 	var fqdn string
-	// var port string
 
 	fqdn, _, err = net.SplitHostPort(u.Host)
 	if err != nil {
@@ -66,6 +65,7 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 		return r
 	}
 
+	// Resolve IP address
 	_, err = net.ResolveIPAddr("ip", fqdn)
 	if err != nil {
 		r.Error = "Failed"
@@ -81,12 +81,14 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 	addurl, _ := hostFromURL(redirecturl)
 	urllist[addurl] = true
 
-	/*
-		req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
-	*/
+	// set nextURL for routine
 	nextURL := redirecturl
+
 	var i int
+
+	// max 20 times
 	for i < 20 {
+		// set client to CheckRedirect, not following the redirect
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
@@ -98,6 +100,7 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 			nextURL = redirecturl + nextURL
 		}
 
+		// Repair the request
 		req, err := http.NewRequest("GET", nextURL, nil)
 		if err != nil {
 			r.Error = "Failed"
@@ -105,8 +108,10 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 			return r
 		}
 
+		// Set User-Agent
 		req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
 
+		// Do the request.
 		resp, err := client.Do(req)
 		if err != nil {
 			r.Error = "Failed"
@@ -115,6 +120,7 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 		}
 		defer resp.Body.Close()
 
+		// Set soms vars.
 		redirect := new(Redirects)
 		redirect.StatusCode = resp.StatusCode
 		redirect.URL = resp.Request.URL.String()
