@@ -24,6 +24,7 @@ type HTTPRedirects struct {
 type Redirects struct {
 	StatusCode int    `json:"statuscode,omitempty"`
 	URL        string `json:"url,omitempty"`
+	Protocol   string `json:"protocol,omitempty"`
 }
 
 // Hosts struct
@@ -80,9 +81,12 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 	addurl, _ := hostFromURL(redirecturl)
 	urllist[addurl] = true
 
+	/*
+		req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
+	*/
 	nextURL := redirecturl
 	var i int
-	for i < 100 {
+	for i < 20 {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
@@ -94,17 +98,27 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 			nextURL = redirecturl + nextURL
 		}
 
-		resp, err := client.Get(nextURL)
-
+		req, err := http.NewRequest("GET", nextURL, nil)
 		if err != nil {
 			r.Error = "Failed"
 			r.ErrorMessage = err.Error()
 			return r
 		}
 
+		req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			r.Error = "Failed"
+			r.ErrorMessage = err.Error()
+			return r
+		}
+		defer resp.Body.Close()
+
 		redirect := new(Redirects)
 		redirect.StatusCode = resp.StatusCode
 		redirect.URL = resp.Request.URL.String()
+		redirect.Protocol = resp.Proto
 
 		// Only unique hosts in hostlist
 		addurl, _ := hostFromURL(resp.Request.URL.String())
@@ -114,11 +128,7 @@ func Get(redirecturl string, nameserver string) *HTTPRedirects {
 
 		r.Redirects = append(r.Redirects, redirect)
 
-		// fmt.Println("StatusCode:", resp.StatusCode)
-		// fmt.Println(resp.Request.URL)
-
 		if resp.StatusCode == 200 || resp.StatusCode > 303 {
-			// fmt.Println("Done!")
 			break
 		} else {
 			nextURL = resp.Header.Get("Location")
