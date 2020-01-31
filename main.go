@@ -16,7 +16,7 @@ type Data struct {
 	URL          string       `json:"url,omitempty"`
 	Redirects    []*Redirects `json:"redirects,omitempty"`
 	Hosts        []*Hosts     `json:"hosts,omitempty"`
-	Error        string       `json:"error,omitempty"`
+	Error        bool         `json:"error,omitempty"`
 	ErrorMessage string       `json:"errormessage,omitempty"`
 }
 
@@ -33,7 +33,7 @@ type Hosts struct {
 	IPv4         []string `json:"ipv4,omitempty"`
 	IPv6         []string `json:"ipv6,omitempty"`
 	CNAME        string   `json:"cname,omitempty"`
-	Error        string   `json:"error,omitempty"`
+	Error        bool     `json:"error,omitempty"`
 	ErrorMessage string   `json:"errormessage,omitempty"`
 }
 
@@ -45,7 +45,7 @@ func Get(redirecturl string, nameserver string) *Data {
 
 	u, err := url.Parse(redirecturl)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
@@ -60,7 +60,7 @@ func Get(redirecturl string, nameserver string) *Data {
 	// Valid server name (ASCII or IDN)
 	fqdn, err = idna.ToASCII(fqdn)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
@@ -68,7 +68,7 @@ func Get(redirecturl string, nameserver string) *Data {
 	// Resolve IP address
 	_, err = net.ResolveIPAddr("ip", fqdn)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
@@ -103,7 +103,7 @@ func Get(redirecturl string, nameserver string) *Data {
 		// Repair the request
 		req, err := http.NewRequest("GET", nextURL, nil)
 		if err != nil {
-			r.Error = "Failed"
+			r.Error = true
 			r.ErrorMessage = err.Error()
 			return r
 		}
@@ -114,7 +114,7 @@ func Get(redirecturl string, nameserver string) *Data {
 		// Do the request.
 		resp, err := client.Do(req)
 		if err != nil {
-			r.Error = "Failed"
+			r.Error = true
 			r.ErrorMessage = err.Error()
 			return r
 		}
@@ -166,7 +166,7 @@ func getHosts(geturl string, nameserver string) *Hosts {
 
 	cname, err := GetCNAME(r.Hostname, nameserver)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
@@ -178,7 +178,7 @@ func getHosts(geturl string, nameserver string) *Hosts {
 
 	ar, err := GetA(r.Hostname, nameserver)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
@@ -186,7 +186,7 @@ func getHosts(geturl string, nameserver string) *Hosts {
 
 	aaaar, err := GetAAAA(r.Hostname, nameserver)
 	if err != nil {
-		r.Error = "Failed"
+		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
