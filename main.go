@@ -22,6 +22,7 @@ type Data struct {
 
 // Redirects struct
 type Redirects struct {
+	Number     int    `json:"number"`
 	StatusCode int    `json:"statuscode,omitempty"`
 	URL        string `json:"url,omitempty"`
 	Protocol   string `json:"protocol,omitempty"`
@@ -109,7 +110,7 @@ func Get(redirecturl string, nameserver string) *Data {
 		}
 
 		// Set User-Agent
-		req.Header.Set("User-Agent", "Golang_Spider_Bot/3.0")
+		req.Header.Set("User-Agent", "Golang_Research_Bot/3.0")
 
 		// Do the request.
 		resp, err := client.Do(req)
@@ -122,6 +123,7 @@ func Get(redirecturl string, nameserver string) *Data {
 
 		// Set soms vars.
 		redirect := new(Redirects)
+		redirect.Number = i
 		redirect.StatusCode = resp.StatusCode
 		redirect.URL = resp.Request.URL.String()
 		redirect.Protocol = resp.Proto
