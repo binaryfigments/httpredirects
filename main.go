@@ -98,7 +98,7 @@ func Get(redirecturl string, nameserver string) *Data {
 		// nextURL prefix check for incomplete
 		if caseInsenstiveContains(nextURL, "http://") == false && caseInsenstiveContains(nextURL, "https://") == false {
 			// TODO: Set warning
-			nextURL = redirecturl + nextURL
+			nextURL = "http://" + nextURL
 		}
 
 		// Repair the request
