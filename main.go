@@ -43,20 +43,13 @@ func Get(redirecturl string, nameserver string) *Data {
 	r := new(Data)
 
 	r.URL = redirecturl
-
 	u, err := url.Parse(redirecturl)
 	if err != nil {
 		r.Error = true
 		r.ErrorMessage = err.Error()
 		return r
 	}
-
-	var fqdn string
-
-	fqdn, _, err = net.SplitHostPort(u.Host)
-	if err != nil {
-		fqdn = u.Host
-	}
+	fqdn := u.Hostname()
 
 	// Valid server name (ASCII or IDN)
 	fqdn, err = idna.ToASCII(fqdn)
